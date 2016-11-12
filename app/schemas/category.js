@@ -1,13 +1,12 @@
 var mongoose = require('mongoose');
-var MovieSchema = new mongoose.Schema({
-	doctor: String,
-	title: String,
-	language: String,
-	country: String,
-	summary: String,
-	flash: String,
-	poster: String,
-	year: Number,
+var Schema = mongoose.Schema;
+var ObjectId = Schema.Types.ObjectId;
+
+//骨架模版
+var CategorySchema = new Schema({
+	name: String,
+	movies: [{type: ObjectId, ref:'movies'}],
+
 	meta: {
 		creatAt: {
 			type: Date,
@@ -20,8 +19,8 @@ var MovieSchema = new mongoose.Schema({
 	}
 });
 
-///模式方法，save表示每次存储都会调用一次
-MovieSchema.pre('save', function(next){
+///保存数据到mongoDB数据库。模式方法，save操作之前都会调用一次
+CategorySchema.pre('save', function(next){
 	if(this.isNew){
 		this.meta.creatAt = this.meta.updateAt = Date.now();
 	} else {
@@ -31,7 +30,8 @@ MovieSchema.pre('save', function(next){
 	next();
 });
 
-MovieSchema.statics = {
+//mongoDB数据库查询
+CategorySchema.statics = {
 	fetch: function(cb) {
 		return this
 			.find({})
@@ -45,4 +45,4 @@ MovieSchema.statics = {
 	}
 }
 
-module.exports = MovieSchema;
+module.exports = CategorySchema;
